@@ -1,3 +1,39 @@
-docker swarm join \
-    --token SWMTKN-1-1f6ypogvsrbe6efr67mfvqk4jke8hn7ig53p3sk6nk4nmackso-8768rxt1fd2g9wuiz0o7pq75m \
-    192.168.43.184:2377
+========== KONFIGURASI SSH ==========
+sudo apt-get install openssh-client openssh-server
+sudo ufw enable
+ufw allow ssh
+ufw default allow incoming
+ufw default allow outgoing
+
+========== FOLDER DENGAN AKSES UNTUK SSH ==========
+mkdir -p /migration
+chmod -R 777 /migration
+setfacl -d -m u::rwx,g::rwx,o::rwx /path/to/folder [akses untuk file yang baru ditambah]
+
+========== CHECKPOINT DOCKER ==========
+Server
+docker run -d --name looper busybox:latest \
+         /bin/sh -c 'i=0; while true; do echo $i; i=$(expr $i + 1); sleep 1; done'
+docker checkpoint create --checkpoint-dir=/migration looper checkpoint1
+
+========== ARCHIVE FILE CHECKPOINT ==========
+tar zcvf /migration/checkpoint1.tgz --directory=/ migration
+
+========== MIGRATE FILE SSH ==========
+scp /migration/checkpoint1.tgz toshiba@192.168.43.184:/migration
+
+========== EXTRACT FILE ==========
+tar -xvf looper_cp.tar
+
+========== RESTORE DOCKER ==========
+docker create --name looper-clone busybox:latest \
+         /bin/sh -c 'i=0; while true; do echo $i; i=$(expr $i + 1); sleep 1; done'
+
+docker start --checkpoint-dir=/migration/migration --checkpoint=checkpoint1 looper-clone
+docker ps
+
+===== Req untuk code python ======
+sudo apt install python-pip
+pip install paramiko
+
+rm -R checkpoint1 && rm checkpoint1.tgz && docker container prune
