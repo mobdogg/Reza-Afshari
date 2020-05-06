@@ -1,72 +1,9 @@
-import docker
+import tarfile
+import os
 
+fname = "checkpoint1.tgz"
+tf = tarfile.open(fname)
+tf.extractall('/migration')
 
-def mainMenu():
-	print("===== MENU =====")
-	print(" ")
-	print("1. Hello World");
-	print("2. List Images");
-	print("3. Running Container");
-	print("4. Stop Container");
-	print("5. Exit");
-	while True:
-		try:
-			answer = int(input ("Enter Answer = "))
-			if answer ==1:
-				hello()
-				break
-
-			elif answer ==2:
-				images()
-				break
-
-			elif answer ==3:
-				run()
-				break
-
-			elif answer ==4:
-				stop()
-				break
-	
-			elif answer ==5:
-				exit
-				break
-			else:
-				print("pilih angka 1-5")
-				mainMenu()
-		except ValueError:
-			print("pilih angka 1-5")
-	exit
-		
-
-def hello():
-	print("this action will run the hello world")
-	client = docker.from_env()
-	print client.containers.run("ubuntu:xenial-20200114", ["echo", "hello", "world"])
-	anykey = input("press any key to main menu = ")
-	mainMenu()
-def images():
-	print("this action will List all Images")
-	client = docker.from_env()
-	for image in client.images.list():
-		print image.tag
-	anykey = input("press 1-5 to main menu = ")
-	mainMenu()
-def run():
-	print("this action will Run a Container")
-	client = docker.from_env()
-	container = client.containers.get('mongoserver')
-	container.start()
-	print(container.name); print("Started")
-	anykey = input("press any key to main menu = ")
-	mainMenu()
-def stop():
-	print("this action will Stop All Containers")
-	client = docker.from_env()
-	for container in client.containers.list():
-		container.stop()
-	anykey = input("press any key to main menu = ")
-	mainMenu()
-
-# main routine()
-mainMenu()
+os.system("docker create --name looper-clone busybox:latest /bin/sh -c 'i=0; while true; do echo #$i; i=$(expr $i + 1); sleep 1; done'")
+os.system("docker start --checkpoint-dir=/migration/migration --checkpoint=checkpoint1 looper-clone")
