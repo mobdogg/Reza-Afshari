@@ -1,0 +1,39 @@
+========== KONFIGURASI SSH ==========
+sudo apt-get install openssh-client openssh-server
+sudo ufw enable
+ufw allow ssh
+ufw default allow incoming <WAJIB SETIAP ABIS NYALAIN LAPTOP>
+ufw default allow outgoing <WAJIB SETIAP ABIS NYALAIN LAPTOP>
+
+========== FOLDER DENGAN AKSES UNTUK SSH ==========
+mkdir -p /migration
+chmod -R 777 /migration
+setfacl -d -m u::rwx,g::rwx,o::rwx /migration [akses untuk file yang baru ditambah]
+
+========== CHECKPOINT DOCKER ==========
+docker run -d --name looper busybox:latest \
+         /bin/sh -c 'i=0; while true; do echo $i; i=$(expr $i + 1); sleep 1; done'
+docker checkpoint create --checkpoint-dir=/migration looper checkpoint1
+
+========== ARCHIVE FILE CHECKPOINT ==========
+tar zcvf /migration/checkpoint1.tgz --directory=/ migration
+
+========== MIGRATE FILE SSH ==========
+scp /migration/checkpoint1.tgz toshiba@192.168.43.184:/migration
+
+========== EXTRACT FILE ==========
+tar -xvf checkpoint1.tgz
+
+========== RESTORE DOCKER ==========
+docker create --name looper-clone busybox:latest \
+         /bin/sh -c 'i=0; while true; do echo $i; i=$(expr $i + 1); sleep 1; done'
+
+docker start --checkpoint-dir=/migration/migration --checkpoint=checkpoint1 looper-clone
+docker ps
+
+===== Req untuk code python ======
+sudo apt install python-pip
+pip install paramiko
+pip install watchdog
+
+rm -R checkpoint1 && rm checkpoint1.tgz && docker container prune
