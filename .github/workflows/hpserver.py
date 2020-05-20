@@ -10,6 +10,8 @@ ip = socket.gethostname()
 listensocket.bind(('',port))
 listensocket.listen(5)
 clientsocket, client_address = listensocket.accept()
+os.system("docker run -d --name looper busybox:latest \
+         /bin/sh -c 'i=0; while true; do echo $i; i=$(expr $i + 1); sleep 1; done'")
 print("Connected")
 running=True
 while running:
@@ -19,5 +21,5 @@ while running:
             os.system("python hosta.py")
             time.sleep(0)
     	else:
-            clientsocket.close()
+            #clientsocket.close()
             running = False
