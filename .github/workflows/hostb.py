@@ -2,6 +2,7 @@ import time
 import os
 from watchdog.observers import Observer 
 from watchdog.events import FileSystemEventHandler 
+import tarfile
   
   
 class OnMyWatch: 
@@ -30,12 +31,15 @@ class Handler(FileSystemEventHandler):
     @staticmethod
     def on_any_event(event): 
         if event.is_directory: 
-            return None
+            return None 
         elif event.event_type == 'modified': 
             # Event is modified, you can process it now
-	    os.system("docker run -d --name looper busybox:latest /bin/sh -c 'i=0; while true; do echo $i; i=$(expr $i + 1); sleep 1; done'")
+	    tf = tarfile.open("checkpoint1.tgz")
+	    tf.extractall()
+	    os.system("python hostb2.py")
+	    exit()
               
   
 if __name__ == '__main__': 
     watch = OnMyWatch() 
-    watch.run() 
+watch.run() 
