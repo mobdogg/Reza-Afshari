@@ -15,7 +15,7 @@ tardir('/migration', 'checkpoint1.tgz')
 
 ssh=paramiko.SSHClient()
 ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-ssh.connect(hostname="toshiba",username="toshiba",password="123456")
+ssh.connect(hostname="192.168.43.184",username="toshiba",password="123456")
 #Raises BadHostKeyException,AuthenticationException,SSHException,socket error
 
 sftp=ssh.open_sftp()
