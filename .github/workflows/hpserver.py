@@ -3,9 +3,8 @@
 import socket
 import time
 import os
-from binascii import unhexlify
-
-
+import sys
+from datetime import datetime
 
 listensocket = socket.socket()
 port=8080
@@ -13,15 +12,16 @@ ip = socket.gethostname()
 listensocket.bind(('',port))
 listensocket.listen(5)
 clientsocket, client_address = listensocket.accept()
-os.system("docker run -d --name looper busybox:latest \
-         /bin/sh -c 'i=0; while true; do echo $i; i=$(expr $i + 1); sleep 1; done'")
+print("Connected")
+sys.stdout.write("Starting ")
+print datetime.now().strftime('%H:%M:%S.%f')[:-4]
+#os.system("docker run -d --name looper busybox:latest \
+         #/bin/sh -c 'i=0; while true; do echo $i; i=$(expr $i + 1); sleep 1; done'")
 running=True
 while running:
         message = clientsocket.recv(1024).decode()
     	if not message == "":
-	    print("Waiting for Handover Complete")
 	    fullData = "Connected"
-	    clientsocket.send(fullData.encode())
 	    os.system("python hosta.py")
             time.sleep(0)
     	else:
