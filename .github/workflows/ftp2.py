@@ -5,22 +5,12 @@ import datetime
 import tarfile
 
 class Timer(object):
-    """A simple timer class"""
-    
     def __init__(self):
         pass
-    
     def start(self):
-        """Starts the timer"""
         self.start = datetime.datetime.now()
         print ("0:00:00.000")
-    
-    def stop(self):
-        """Stops the timer.  Returns the time elapsed"""
-        self.stop = datetime.datetime.now()
-        print str(self.stop - self.start)
     def elapsed(self):
-        """Time elapsed since start was called"""
         print str(datetime.datetime.now() - self.start)[:-3]
 watch=Timer()
 watch.start()
