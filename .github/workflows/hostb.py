@@ -1,40 +1,13 @@
 import time 
 import os
-from watchdog.observers import Observer 
-from watchdog.events import FileSystemEventHandler 
 import sys
-from datetime import datetime
+import socket
   
-
-class OnMyWatch: 
-    # Set the directory on watch 
-    watchDirectory = "/migration"
-    def __init__(self): 
-        self.observer = Observer() 
-    def run(self): 
-        event_handler = Handler() 
-        self.observer.schedule(event_handler, self.watchDirectory, recursive = True) 
-        self.observer.start() 
-        try: 
-            while True: 
-                time.sleep(7) 
-        except: 
-            self.observer.stop() 
-            print("Observer Stopped") 
-        self.observer.join()
-
-class Handler(FileSystemEventHandler): 
- 
-    @staticmethod
-    def on_any_event(event): 
-        if event.is_directory: 
-            return None 
-        elif event.event_type == 'modified': 
-            # Event is modified, you can process it now
-	    os.system("python hostb2.py")
-	    exit()
-              
-  
-if __name__ == '__main__': 
-    watch = OnMyWatch() 
-watch.run() 
+listensocket = socket.socket()
+port=8282
+ip = socket.gethostname()
+listensocket.bind(('',port))
+listensocket.listen(5)
+clientsocket, client_address = listensocket.accept()
+os.system("python hostb2.py")
+exit()
